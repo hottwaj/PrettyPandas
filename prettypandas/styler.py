@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-from IPython.display import HTML
 try:
     from pandas.core.style import Styler
 except ImportError:
@@ -28,7 +27,7 @@ def apply_pretty_globals():
     in your notebook, go ahead and use this. Otherwise use the ``PrettyPandas``
     class.
     """
-
+    from IPython.display import HTML
     return HTML("""
         <style type='text/css'>
             /* Pretty Pandas Dataframes */
@@ -465,24 +464,3 @@ class PrettyPandas(Styler):
                     if isinstance(v, Number) and np.isnan(v):
                         cell['display_value'] = self.replace_all_nans_with 
         return result
-
-
-class PrettyPandasNoIndex(PrettyPandas):
-    """Subclass of PrettyPandas that hides the Index using CSS.
-    
-    Constructor accepts all parameters provided by PrettyPandas
-    """    
-    _no_index_styles = [
-        {'selector': '.row_heading', 'props': [('display', 'none')]},
-        {'selector': '.blank', 'props': [('display', 'none')]}
-    ]    
-
-    def __init__(self, dataframe, table_styles=[], *args, **kwargs):
-        import warnings
-        warnings.warn('PrettyPandasNoIndex is deprecated - use PrettyPandas(show_index = False) instead')
-        
-        super(PrettyPandasNoIndex, self) \
-            .__init__(dataframe,
-                      *args,
-                      table_styles = table_styles + self._no_index_styles,
-                      **kwargs)

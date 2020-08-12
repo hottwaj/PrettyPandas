@@ -1,4 +1,4 @@
-from .styler import apply_pretty_globals, PrettyPandas, PrettyPandasNoIndex
+from .styler import apply_pretty_globals, PrettyPandas
 
 
-__all__ = ['PrettyPandas', 'PrettyPandasNoIndex', 'apply_pretty_globals']
+__all__ = ['PrettyPandas', 'apply_pretty_globals']

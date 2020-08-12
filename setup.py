@@ -10,12 +10,12 @@ with open(path.join(here, 'README.txt'), encoding='utf-8') as f:
 setup(
     name='prettypandas',
 
-    version='0.0.2',
+    version='0.0.2jc',
 
     description='Pandas Styler for Report Quality Tables.',
     long_description=long_description,
 
-    url='https://github.com/HHammond/PrettyPandas',
+    url='https://github.com/hottwaj/PrettyPandas',
 
     author='Henry Hammond',
     author_email='henryhhammond92@gmail.com',
@@ -45,9 +45,8 @@ setup(
 
     install_requires=[
         "babel",
-        "ipython",
         "numpy",
         "jinja2",
-        "pandas >= 0.17.1"
+        "pandas >= 0.20"
     ],
 )
