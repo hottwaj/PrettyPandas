@@ -387,9 +387,13 @@ class PrettyPandas(Styler):
         summary_colnames = [series.columns[0] for series in self.summary_cols]
         summary_rownames = [series.index[0] for series in self.summary_rows]
 
+        # preserve index&columns names
+        index_names = self.data.index.names
+        columns_names = self.data.columns.names
+        
         rows, cols = self.data.shape
         ix_rows = self.data.index.size
-        ix_cols = len(self.data.index.names)
+        ix_cols = len(index_names)
 
         # Add summary rows and columns
         self.data = pd.concat([self.data] + self.summary_cols,
@@ -416,6 +420,10 @@ class PrettyPandas(Styler):
         # Fix shared summary cells to be empty
         for row, col in product(summary_rownames, summary_colnames):
             self.data.loc[row, col] = ''
+            
+        #replace index&columns names which can be erased due to concat
+        self.data.index.names = index_names
+        self.data.columns.names = columns_names
 
         return self
 
@@ -426,6 +434,10 @@ class PrettyPandas(Styler):
         self._apply_summaries()
         self._apply_formatters()
         formatted_df = self.data
+        
+        # underlying Styler relies on these (created at __init__), but they need to be updated based on summaries applied
+        self.index = self.data.index  
+        self.columns = self.data.columns
         result = super(self.__class__, self)._translate()
 
         # Revert changes to inner data
@@ -442,20 +454,23 @@ class PrettyPandas(Styler):
     def _translate(self):
         """Apply styles and formats before rendering."""
         result = self.get_formatted_df(as_html = True)
-        for row in result['body']:
-            for cell in row:
-                if not cell.get('is_visible', True):
-                    cell['is_visible'] = True
 
         head = result['head']
-        if len(head) == 2 and 'blank' in head[0][0]['class'] and 'blank' not in head[1][0]['class']:
+        if len(head) == 2:
+            #try to merge index name column headers with column index
             merge_headers = True
-            for col in head[1][1:]:
-                if 'blank' not in col['class']:
+            merged = []
+            for col0, col1 in zip(head[0], head[1]):
+                if 'blank' not in col0['class'] and 'blank' in col1['class']:
+                    merged.append(col0)
+                elif 'blank' in col0['class'] and 'blank' not in col1['class']:
+                    merged.append(col1)
+                else:
                     merge_headers = False
+                    break
+
             if merge_headers:
-                head[0][0] = head[1][0]
-                result['head'] = [head[0]]
+                result['head'] = [merged]
         
         if self.replace_all_nans_with is not None:
             for row in result['body']:
