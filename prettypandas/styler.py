@@ -4,7 +4,7 @@ try:
     from pandas.core.style import Styler
 except ImportError:
     from pandas.io.formats.style import Styler
-from pandas.core.indexing import _non_reducing_slice
+
 from pandas.api.types import is_float
 import pandas as pd
 import numpy as np
